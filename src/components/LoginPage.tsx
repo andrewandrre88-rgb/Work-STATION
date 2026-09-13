@@ -65,6 +65,16 @@ export const LoginPage: React.FC = () => {
                   >
                     Open in new tab ↗
                   </a>
+                  {error.includes('Authorized Domains') && (
+                    <a
+                      href="https://console.firebase.google.com/project/gen-lang-client-0738073213/authentication/settings"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-purple-900 bg-purple-100 hover:bg-purple-200 px-2.5 py-1 rounded-lg transition"
+                    >
+                      Open Firebase Console ↗
+                    </a>
+                  )}
                   <button
                     type="button"
                     onClick={clearError}

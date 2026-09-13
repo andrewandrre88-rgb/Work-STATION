@@ -88,6 +88,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setError('Sign-in cancelled before completion.');
       } else if (firebaseError.code === 'auth/cancelled-popup-request') {
         // Ignored
+      } else if (firebaseError.code === 'auth/unauthorized-domain') {
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : 'work-station-bay.vercel.app';
+        setError(`Domain not authorized: "${hostname}" must be added to Authorized Domains in your Firebase Console (Authentication > Settings > Authorized domains).`);
       } else {
         setError(firebaseError.message || 'Failed to sign in with Google. Please try again.');
       }
