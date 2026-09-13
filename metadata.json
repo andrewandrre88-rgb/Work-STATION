@@ -1,0 +1,6 @@
+{
+  "name": "Productivity Workspace",
+  "description": "An all-in-one productivity workspace to organize projects, track ideas through execution, manage tasks with reminders, and track client contact details and requests.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

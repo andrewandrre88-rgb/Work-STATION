@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "users": {
+      "description": "User profile details linked to Google Account",
+      "fields": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID"
+        },
+        "email": {
+          "type": "string",
+          "description": "User Google account email"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User Google account display name"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "User Google profile avatar photo URL"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp when user first logged in"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "description": "ISO timestamp of most recent login"
+        }
+      },
+      "indexes": []
+    },
+    "userWorkspaces": {
+      "description": "User workspace data containing all projects, tasks, clients, and ideas linked to the Google account",
+      "fields": {
+        "userId": {
+          "type": "string",
+          "description": "Owner Google Auth UID"
+        },
+        "projects": {
+          "type": "array",
+          "description": "List of user projects with milestones and statuses"
+        },
+        "tasks": {
+          "type": "array",
+          "description": "List of user tasks with reminders, due dates, and priorities"
+        },
+        "clients": {
+          "type": "array",
+          "description": "List of client contacts and their deliverables"
+        },
+        "ideas": {
+          "type": "array",
+          "description": "List of ideas and implementation roadmaps"
+        },
+        "habits": {
+          "type": "array",
+          "description": "Daily productivity habits and streak completions"
+        },
+        "scratchpad": {
+          "type": "string",
+          "description": "Instant brainstorm notes and scratchpad"
+        },
+        "focusSessions": {
+          "type": "array",
+          "description": "Completed pomodoro and focus work sessions"
+        },
+        "timeBlocks": {
+          "type": "array",
+          "description": "Daily schedule time-boxed hour allocations"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp when the workspace was last updated"
+        }
+      },
+      "indexes": []
+    }
+  }
+}
