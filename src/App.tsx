@@ -53,10 +53,12 @@ const WorkspaceAppContent: React.FC = () => {
   const isProjectsTab = activeTab === 'projects';
 
   return (
-    <div className="min-h-screen bg-[#f8f6fb] text-stone-900 font-sans flex flex-col selection:bg-purple-200">
+    <div className={`bg-[#f8f6fb] text-stone-900 font-sans flex flex-col selection:bg-purple-200 ${
+      isProjectsTab ? 'h-screen overflow-hidden' : 'min-h-screen'
+    }`}>
       {/* Guest Mode Callout Banner */}
       {!user && guestMode && (
-        <div className="bg-[#e56824] text-white px-4 py-2 text-xs font-medium flex items-center justify-between shadow-xs">
+        <div className="bg-[#e56824] text-white px-4 py-2 text-xs font-medium flex items-center justify-between shadow-xs shrink-0">
           <div className="flex items-center gap-2 max-w-4xl mx-auto w-full justify-between">
             <div className="flex items-center gap-2">
               <Cloud className="w-4 h-4 shrink-0 text-orange-100" />
@@ -85,8 +87,8 @@ const WorkspaceAppContent: React.FC = () => {
       {/* Main Tab Navigation */}
       <Navigation />
 
-      {/* Main Workspace Body: Full-width for Trello board, centered container for dashboard/tasks/ideas/clients */}
-      <main className={isProjectsTab ? "flex-1 w-full flex flex-col p-0" : "flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6"}>
+      {/* Main Workspace Body: Full-width and fixed height for Trello board, centered container for dashboard/tasks/ideas/clients */}
+      <main className={isProjectsTab ? "flex-1 min-h-0 w-full flex flex-col p-0 overflow-hidden" : "flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6"}>
         {activeTab === 'dashboard' && (
           <DashboardView onOpenQuickAdd={handleOpenQuickAdd} />
         )}

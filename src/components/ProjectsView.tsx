@@ -444,12 +444,12 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
   };
 
   return (
-    <div className="flex flex-col h-full w-full min-h-[calc(100vh-140px)]">
+    <div className="flex flex-col h-full w-full flex-1 min-h-0 overflow-hidden">
       {/* Trello Board Top Bar (Matches Screenshot Deep Purple Header) */}
-      <div className="bg-[#48216e] text-white px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-3 shadow-md shrink-0 border-b border-purple-900/40 relative z-30">
+      <div className="bg-[#48216e] text-white px-2.5 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3 shadow-xs shrink-0 border-b border-purple-900/40 relative z-20">
         {/* Left: Board Selector, Layout Icon & View Switcher */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div ref={boardDropdownContainerRef} className="relative">
+        <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink-0">
+          <div ref={boardDropdownContainerRef} className="relative shrink-0">
             <button
               type="button"
               id="trello-board-selector-btn"
@@ -467,12 +467,12 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
                 });
               }}
               aria-expanded={showBoardDropdown}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/15 active:bg-white/20 transition text-white font-bold text-sm sm:text-base cursor-pointer truncate max-w-[200px] sm:max-w-xs focus:outline-none focus:ring-2 focus:ring-purple-300/50"
+              className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-white/15 active:bg-white/20 transition text-white font-bold text-xs sm:text-sm cursor-pointer truncate max-w-[130px] xs:max-w-[180px] sm:max-w-xs focus:outline-none focus:ring-2 focus:ring-purple-300/50"
             >
               <Columns3 className="w-4 h-4 text-purple-200 shrink-0" />
               <span className="truncate">{activeBoard.title}</span>
               <ChevronDown
-                className={`w-4 h-4 text-purple-300 shrink-0 transition-transform duration-200 ${
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-300 shrink-0 transition-transform duration-200 ${
                   showBoardDropdown ? 'rotate-180 text-white' : ''
                 }`}
               />
@@ -581,10 +581,10 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
         </div>
 
         {/* Right Actions: Icons, Avatar, Share button (Exact match to Screenshot_13.png) */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 ml-auto">
           {/* User Circular Avatar "AA" */}
           <div
-            className="w-7 h-7 rounded-full bg-[#e56824] text-white flex items-center justify-center font-bold text-xs shadow-xs border border-white/30 shrink-0"
+            className="w-6.5 h-6.5 sm:w-7 sm:h-7 rounded-full bg-[#e56824] text-white flex items-center justify-center font-bold text-[11px] sm:text-xs shadow-xs border border-white/30 shrink-0"
             title="andrewandrre88@gmail.com"
           >
             AA
@@ -594,7 +594,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
           <button
             type="button"
             onClick={() => setShowAutomationModal(true)}
-            className="p-1.5 rounded-md text-purple-200 hover:text-white hover:bg-white/15 transition cursor-pointer"
+            className="hidden sm:inline-flex p-1.5 rounded-md text-purple-200 hover:text-white hover:bg-white/15 transition cursor-pointer shrink-0"
             title="Power-Ups"
           >
             <Plug className="w-4 h-4" />
@@ -604,14 +604,14 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
           <button
             type="button"
             onClick={() => setShowAutomationModal(true)}
-            className="p-1.5 rounded-md text-purple-200 hover:text-white hover:bg-white/15 transition cursor-pointer"
+            className="hidden sm:inline-flex p-1.5 rounded-md text-purple-200 hover:text-white hover:bg-white/15 transition cursor-pointer shrink-0"
             title="Automation & Rules"
           >
             <Zap className="w-4 h-4" />
           </button>
 
           {/* Filter button */}
-          <div ref={filterDropdownContainerRef} className="relative">
+          <div ref={filterDropdownContainerRef} className="relative shrink-0">
             <button
               type="button"
               id="trello-filter-btn"
@@ -708,7 +708,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
             type="button"
             id="trello-star-btn"
             onClick={() => setIsStarred(!isStarred)}
-            className={`p-1.5 rounded-md transition cursor-pointer ${
+            className={`p-1.5 rounded-md transition cursor-pointer shrink-0 ${
               isStarred
                 ? 'text-amber-300 hover:text-amber-200 bg-white/15 ring-1 ring-amber-300/40'
                 : 'text-purple-200 hover:text-amber-300 hover:bg-white/15'
@@ -719,7 +719,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
           </button>
 
           {/* More options `...` (Board Menu Dropdown) */}
-          <div ref={boardOptionsContainerRef} className="relative">
+          <div ref={boardOptionsContainerRef} className="relative shrink-0">
             <button
               type="button"
               id="trello-board-options-btn"
@@ -876,22 +876,22 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
             type="button"
             id="trello-share-btn"
             onClick={() => setShowShareModal(true)}
-            className="bg-white text-[#48216e] hover:bg-purple-50 font-bold px-3 py-1.5 rounded-md text-xs flex items-center gap-1.5 shadow-sm transition cursor-pointer shrink-0"
+            className="bg-white text-[#48216e] hover:bg-purple-50 font-bold px-2.5 sm:px-3 py-1.5 rounded-md text-xs flex items-center gap-1 sm:gap-1.5 shadow-sm transition cursor-pointer shrink-0"
           >
             <Share2 className="w-3.5 h-3.5" />
-            <span>Share</span>
+            <span className="hidden xs:inline">Share</span>
           </button>
         </div>
       </div>
 
       {/* Main Board Container: Left Inbox Sidebar + Canvas with Lists (Trello Mode) */}
       {viewMode === 'trello' ? (
-        <div className="flex-1 flex overflow-hidden relative">
-          {/* Mobile Backdrop for Inbox Drawer */}
+        <div className="flex-1 min-h-0 flex overflow-hidden relative">
+          {/* Mobile Backdrop for Inbox Drawer (dims board canvas without covering top navbars) */}
           {isInboxOpen && (
             <div
               onClick={() => setIsInboxOpen(false)}
-              className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs z-35 md:hidden transition-opacity cursor-pointer animate-in fade-in duration-200"
+              className="absolute inset-0 bg-stone-950/40 backdrop-blur-xs z-25 md:hidden transition-opacity cursor-pointer animate-in fade-in duration-200"
               aria-hidden="true"
             />
           )}
@@ -901,10 +901,10 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
             <aside
               id="trello-inbox-sidebar"
               ref={inboxSidebarRef}
-              className="fixed md:relative inset-y-0 left-0 z-40 md:z-20 w-80 max-w-[85vw] md:w-72 lg:w-80 bg-[#edf4fc] border-r border-[#d4e3f3] flex flex-col shrink-0 shadow-2xl md:shadow-none transition-all duration-300 ease-in-out"
+              className="absolute md:relative inset-y-0 left-0 z-30 md:z-10 w-80 max-w-[85vw] md:w-72 lg:w-80 bg-[#edf4fc] border-r border-[#d4e3f3] flex flex-col shrink-0 shadow-2xl md:shadow-none transition-all duration-300 ease-in-out"
             >
               {/* Inbox Header */}
-              <div className="p-3.5 border-b border-[#d8e7f7] flex items-center justify-between text-stone-800 bg-[#edf4fc] shrink-0 sticky top-0 z-10">
+              <div className="p-3 sm:p-3.5 border-b border-[#d8e7f7] flex items-center justify-between text-stone-800 bg-[#edf4fc] shrink-0 sticky top-0 z-10">
                 <div className="flex items-center gap-2">
                   <Inbox className="w-4 h-4 text-blue-600 shrink-0" />
                   <h3 className="text-sm font-bold text-stone-900">Inbox</h3>

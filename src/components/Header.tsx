@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenQuickAdd, onOpenScratchpad
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-[#48216e] text-white border-b border-purple-900/40 shadow-md">
+    <header className="sticky top-0 z-30 bg-[#48216e] text-white border-b border-purple-900/40 shadow-md shrink-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-15 gap-4">
           {/* Logo / Workspace Title */}

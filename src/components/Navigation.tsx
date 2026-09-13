@@ -79,7 +79,7 @@ export const Navigation: React.FC = () => {
   ];
 
   return (
-    <nav className="border-b border-purple-900/60 bg-[#3b1a5b] shadow-xs relative z-20">
+    <nav className="border-b border-purple-900/60 bg-[#3b1a5b] shadow-xs relative z-20 shrink-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex space-x-1 sm:space-x-3 overflow-x-auto py-2 no-scrollbar">
           {tabs.map((tab) => {
