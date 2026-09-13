@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Inbox,
   Plus,
@@ -135,6 +135,53 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
   const [addingMilestoneProjectId, setAddingMilestoneProjectId] = useState<string | null>(null);
   const [newMilestoneText, setNewMilestoneText] = useState<Record<string, string>>({});
   const [projectToDeleteId, setProjectToDeleteId] = useState<string | null>(null);
+
+  // References for dropdown and slide menu interaction and outside-click dismissal
+  const boardDropdownContainerRef = useRef<HTMLDivElement>(null);
+  const filterDropdownContainerRef = useRef<HTMLDivElement>(null);
+  const boardOptionsContainerRef = useRef<HTMLDivElement>(null);
+  const inboxSidebarRef = useRef<HTMLElement>(null);
+
+  // Close menus on outside click or Escape key press
+  useEffect(() => {
+    const handleDocumentClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (
+        boardDropdownContainerRef.current &&
+        !boardDropdownContainerRef.current.contains(target)
+      ) {
+        setShowBoardDropdown(false);
+      }
+      if (
+        filterDropdownContainerRef.current &&
+        !filterDropdownContainerRef.current.contains(target)
+      ) {
+        setShowFilterMenu(false);
+      }
+      if (
+        boardOptionsContainerRef.current &&
+        !boardOptionsContainerRef.current.contains(target)
+      ) {
+        setShowBoardOptionsMenu(false);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowBoardDropdown(false);
+        setShowFilterMenu(false);
+        setShowBoardOptionsMenu(false);
+        setActiveListMenuId(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleDocumentClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleDocumentClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Current active board
   const boards = data.trelloBoards || [];
@@ -399,26 +446,44 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
   return (
     <div className="flex flex-col h-full w-full min-h-[calc(100vh-140px)]">
       {/* Trello Board Top Bar (Matches Screenshot Deep Purple Header) */}
-      <div className="bg-[#48216e] text-white px-4 py-2.5 flex items-center justify-between gap-3 shadow-md shrink-0 border-b border-purple-900/40 relative z-10">
+      <div className="bg-[#48216e] text-white px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2 sm:gap-3 shadow-md shrink-0 border-b border-purple-900/40 relative z-30">
         {/* Left: Board Selector, Layout Icon & View Switcher */}
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-          <div className="relative">
+          <div ref={boardDropdownContainerRef} className="relative">
             <button
               type="button"
               id="trello-board-selector-btn"
-              onClick={() => setShowBoardDropdown(!showBoardDropdown)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-white/15 transition text-white font-bold text-sm sm:text-base cursor-pointer truncate"
+              onClick={() => {
+                setShowBoardDropdown((prev) => {
+                  const next = !prev;
+                  if (next) {
+                    setShowBoardOptionsMenu(false);
+                    setShowFilterMenu(false);
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                      setIsInboxOpen(false);
+                    }
+                  }
+                  return next;
+                });
+              }}
+              aria-expanded={showBoardDropdown}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/15 active:bg-white/20 transition text-white font-bold text-sm sm:text-base cursor-pointer truncate max-w-[200px] sm:max-w-xs focus:outline-none focus:ring-2 focus:ring-purple-300/50"
             >
               <Columns3 className="w-4 h-4 text-purple-200 shrink-0" />
               <span className="truncate">{activeBoard.title}</span>
-              <ChevronDown className="w-4 h-4 text-purple-300 shrink-0" />
+              <ChevronDown
+                className={`w-4 h-4 text-purple-300 shrink-0 transition-transform duration-200 ${
+                  showBoardDropdown ? 'rotate-180 text-white' : ''
+                }`}
+              />
             </button>
 
             {/* Board Selector Dropdown */}
             {showBoardDropdown && (
-              <div className="absolute left-0 top-full mt-1.5 w-72 bg-white text-stone-900 rounded-xl shadow-2xl border border-stone-200 z-50 p-2 animate-in fade-in zoom-in-95">
-                <div className="px-3 py-1.5 text-[11px] font-semibold text-stone-500 uppercase tracking-wider border-b border-stone-100">
-                  Your Boards
+              <div className="absolute left-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white text-stone-900 rounded-2xl shadow-2xl border border-stone-200 z-50 p-2.5 animate-in fade-in zoom-in-95 duration-150">
+                <div className="px-3 py-1.5 text-[11px] font-semibold text-stone-500 uppercase tracking-wider border-b border-stone-100 flex items-center justify-between">
+                  <span>Your Boards</span>
+                  <span className="text-[10px] text-stone-400 font-normal">Esc to close</span>
                 </div>
                 <div className="max-h-60 overflow-y-auto space-y-1 py-1">
                   {boards.map((b) => (
@@ -546,13 +611,27 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
           </button>
 
           {/* Filter button */}
-          <div className="relative">
+          <div ref={filterDropdownContainerRef} className="relative">
             <button
               type="button"
-              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              id="trello-filter-btn"
+              onClick={() => {
+                setShowFilterMenu((prev) => {
+                  const next = !prev;
+                  if (next) {
+                    setShowBoardDropdown(false);
+                    setShowBoardOptionsMenu(false);
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                      setIsInboxOpen(false);
+                    }
+                  }
+                  return next;
+                });
+              }}
+              aria-expanded={showFilterMenu}
               className={`p-1.5 rounded-md transition cursor-pointer ${
                 cardFilterLabel !== 'all' || cardFilterStatus !== 'all'
-                  ? 'bg-white text-purple-900'
+                  ? 'bg-white text-purple-900 shadow-xs'
                   : 'text-purple-200 hover:text-white hover:bg-white/15'
               }`}
               title="Filter Cards"
@@ -561,12 +640,14 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
             </button>
 
             {showFilterMenu && (
-              <div className="absolute right-0 top-full mt-2 w-64 bg-white text-stone-900 rounded-xl shadow-2xl border border-stone-200 z-50 p-3 animate-in fade-in">
+              <div className="absolute right-0 top-full mt-2 w-64 bg-white text-stone-900 rounded-2xl shadow-2xl border border-stone-200 z-50 p-3 animate-in fade-in zoom-in-95 duration-150">
                 <div className="flex items-center justify-between pb-2 border-b border-stone-100 mb-2">
                   <h4 className="text-xs font-bold text-stone-800">Filter Cards</h4>
                   <button
+                    type="button"
                     onClick={() => setShowFilterMenu(false)}
-                    className="text-stone-400 hover:text-stone-600"
+                    className="text-stone-400 hover:text-stone-600 p-0.5"
+                    title="Close filters"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -638,11 +719,24 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
           </button>
 
           {/* More options `...` (Board Menu Dropdown) */}
-          <div className="relative">
+          <div ref={boardOptionsContainerRef} className="relative">
             <button
               type="button"
               id="trello-board-options-btn"
-              onClick={() => setShowBoardOptionsMenu(!showBoardOptionsMenu)}
+              onClick={() => {
+                setShowBoardOptionsMenu((prev) => {
+                  const next = !prev;
+                  if (next) {
+                    setShowBoardDropdown(false);
+                    setShowFilterMenu(false);
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                      setIsInboxOpen(false);
+                    }
+                  }
+                  return next;
+                });
+              }}
+              aria-expanded={showBoardOptionsMenu}
               className={`p-1.5 rounded-md transition cursor-pointer ${
                 showBoardOptionsMenu
                   ? 'bg-white/20 text-white'
@@ -655,7 +749,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
 
             {showBoardOptionsMenu && (
               <div
-                className="absolute right-0 top-full mt-2 w-72 bg-white text-stone-900 rounded-2xl shadow-2xl border border-stone-200 z-50 p-3 text-xs animate-in fade-in"
+                className="absolute right-0 top-full mt-2 w-72 bg-white text-stone-900 rounded-2xl shadow-2xl border border-stone-200 z-50 p-3 text-xs animate-in fade-in zoom-in-95 duration-150"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between pb-2 border-b border-stone-100 mb-2.5">
@@ -793,44 +887,55 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
       {/* Main Board Container: Left Inbox Sidebar + Canvas with Lists (Trello Mode) */}
       {viewMode === 'trello' ? (
         <div className="flex-1 flex overflow-hidden relative">
-        {/* LEFT INBOX SIDEBAR (Matches pale blue `#e9f2fb` from Screenshot_13.png) */}
-        {isInboxOpen ? (
-          <aside
-            id="trello-inbox-sidebar"
-            className="w-72 sm:w-80 bg-[#edf4fc] border-r border-[#d4e3f3] flex flex-col shrink-0 transition-all z-20"
-          >
-            {/* Inbox Header */}
-            <div className="p-3.5 border-b border-[#d8e7f7] flex items-center justify-between text-stone-800">
-              <div className="flex items-center gap-2">
-                <Inbox className="w-4 h-4 text-blue-600 shrink-0" />
-                <h3 className="text-sm font-bold text-stone-900">Inbox</h3>
-                <span className="text-[11px] font-bold text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded-full">
-                  {inboxCards.length}
-                </span>
+          {/* Mobile Backdrop for Inbox Drawer */}
+          {isInboxOpen && (
+            <div
+              onClick={() => setIsInboxOpen(false)}
+              className="fixed inset-0 bg-stone-950/40 backdrop-blur-xs z-35 md:hidden transition-opacity cursor-pointer animate-in fade-in duration-200"
+              aria-hidden="true"
+            />
+          )}
+
+          {/* LEFT INBOX SIDEBAR (Matches pale blue `#e9f2fb` from Screenshot_13.png) */}
+          {isInboxOpen ? (
+            <aside
+              id="trello-inbox-sidebar"
+              ref={inboxSidebarRef}
+              className="fixed md:relative inset-y-0 left-0 z-40 md:z-20 w-80 max-w-[85vw] md:w-72 lg:w-80 bg-[#edf4fc] border-r border-[#d4e3f3] flex flex-col shrink-0 shadow-2xl md:shadow-none transition-all duration-300 ease-in-out"
+            >
+              {/* Inbox Header */}
+              <div className="p-3.5 border-b border-[#d8e7f7] flex items-center justify-between text-stone-800 bg-[#edf4fc] shrink-0 sticky top-0 z-10">
+                <div className="flex items-center gap-2">
+                  <Inbox className="w-4 h-4 text-blue-600 shrink-0" />
+                  <h3 className="text-sm font-bold text-stone-900">Inbox</h3>
+                  <span className="text-[11px] font-bold text-blue-700 bg-blue-100/70 px-1.5 py-0.5 rounded-full">
+                    {inboxCards.length}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingInboxCard(true)}
+                    className="p-1.5 text-stone-500 hover:text-stone-900 rounded-lg hover:bg-white/70 active:scale-95 transition cursor-pointer"
+                    title="Add card to Inbox"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsInboxOpen(false)}
+                    className="p-1.5 text-stone-500 hover:text-stone-900 rounded-lg hover:bg-white/70 active:scale-95 transition-all cursor-pointer"
+                    title="Collapse Inbox"
+                    aria-label="Collapse Inbox"
+                  >
+                    <ChevronLeft className="w-4 h-4 transition-transform hover:-translate-x-0.5" />
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => setIsAddingInboxCard(true)}
-                  className="p-1 text-stone-500 hover:text-stone-900 rounded hover:bg-white/60 transition"
-                  title="Add card to Inbox"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsInboxOpen(false)}
-                  className="p-1 text-stone-400 hover:text-stone-800 rounded hover:bg-white/60 transition"
-                  title="Collapse Inbox"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Inbox Action: Add a card input */}
-            <div className="p-3">
+              {/* Inbox Action: Add a card input */}
+              <div className="p-3 shrink-0">
               {isAddingInboxCard ? (
                 <form
                   onSubmit={handleAddInboxCardSubmit}
@@ -873,7 +978,7 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
             </div>
 
             {/* Inbox Cards List */}
-            <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-2.5">
+            <div className="flex-1 overflow-y-auto px-3 pb-4 space-y-2.5 overscroll-contain">
               {inboxCards.length === 0 ? (
                 <div className="text-center py-10 px-4 text-stone-400">
                   <Inbox className="w-8 h-8 mx-auto text-blue-300 mb-2" />
@@ -960,13 +1065,18 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
           /* Collapsed Inbox button trigger */
           <button
             type="button"
-            onClick={() => setIsInboxOpen(true)}
-            className="absolute left-0 top-3 z-30 bg-[#edf4fc] text-stone-700 hover:text-blue-800 p-2 rounded-r-xl border-y border-r border-[#d4e3f3] shadow-md flex items-center gap-1 cursor-pointer transition"
+            onClick={() => {
+              setIsInboxOpen(true);
+              setShowBoardDropdown(false);
+              setShowFilterMenu(false);
+              setShowBoardOptionsMenu(false);
+            }}
+            className="absolute left-0 top-3 z-30 bg-[#edf4fc] text-stone-700 hover:text-blue-800 px-2.5 py-2 rounded-r-xl border-y border-r border-[#d4e3f3] shadow-md flex items-center gap-1.5 cursor-pointer transition hover:pr-3 group"
             title="Expand Inbox"
           >
-            <Inbox className="w-4 h-4 text-blue-600" />
+            <Inbox className="w-4 h-4 text-blue-600 group-hover:scale-110 transition-transform" />
             <span className="text-xs font-bold hidden sm:inline">Inbox</span>
-            <ChevronRight className="w-4 h-4 text-stone-400" />
+            <ChevronRight className="w-4 h-4 text-stone-400 group-hover:translate-x-0.5 transition-transform" />
           </button>
         )}
 
