@@ -108,8 +108,9 @@ export const TrelloCardModal: React.FC<TrelloCardModalProps> = ({
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      if (!file.type.startsWith('image/')) return;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file.type.startsWith('image/')) continue;
       const reader = new FileReader();
       reader.onload = (event) => {
         const resultUrl = event.target?.result as string;
@@ -124,7 +125,7 @@ export const TrelloCardModal: React.FC<TrelloCardModalProps> = ({
         setCoverImage((prev) => prev || resultUrl);
       };
       reader.readAsDataURL(file);
-    });
+    }
     e.target.value = '';
   };
 

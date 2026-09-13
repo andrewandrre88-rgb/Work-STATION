@@ -40,6 +40,7 @@ import {
   AlertTriangle,
   MoveRight,
   RotateCcw,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { useWorkspace } from '../context/WorkspaceContext';
 import { TrelloCard, TrelloList, Project, ProjectStatus } from '../types';
@@ -888,8 +889,18 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
                     draggable
                     onDragStart={() => handleDragStart(card.id)}
                     onClick={() => setSelectedCard(card)}
-                    className="bg-white p-3.5 rounded-xl border border-[#dbe6f5] shadow-xs hover:shadow-md transition cursor-pointer group"
+                    className="bg-white p-3.5 rounded-xl border border-[#dbe6f5] shadow-xs hover:shadow-md transition cursor-pointer group overflow-hidden"
                   >
+                    {card.coverImage && (
+                      <div className="w-[calc(100%+1.75rem)] h-24 -mx-3.5 -mt-3.5 mb-2.5 overflow-hidden bg-stone-100">
+                        <img
+                          src={card.coverImage}
+                          alt={card.title}
+                          className="w-full h-full object-cover group-hover:scale-103 transition duration-300"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                    )}
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-xs font-semibold text-stone-900 leading-snug">
                         {card.title}
@@ -917,6 +928,12 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
                       <div className="flex items-center gap-2">
                         <Mail className="w-3.5 h-3.5 text-stone-400" title="Email capture" />
                         <AlignLeft className="w-3.5 h-3.5 text-stone-400" title="Has notes" />
+                        {(card.hasAttachment || card.coverImage || (card.images && card.images.length > 0)) && (
+                          <span className="flex items-center gap-1 text-purple-600 font-medium" title="Attached photos / cover">
+                            <ImageIcon className="w-3.5 h-3.5" />
+                            {card.images && card.images.length > 0 ? card.images.length : ''}
+                          </span>
+                        )}
                       </div>
 
                       {/* Quick Move to First Board List */}
@@ -1245,10 +1262,22 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
                         draggable
                         onDragStart={() => handleDragStart(card.id)}
                         onClick={() => setSelectedCard(card)}
-                        className={`bg-white rounded-xl p-3 shadow-xs hover:shadow-md transition cursor-pointer border border-stone-200/80 group ${
+                        className={`bg-white rounded-xl p-3 shadow-xs hover:shadow-md transition cursor-pointer border border-stone-200/80 group overflow-hidden ${
                           card.completed ? 'opacity-85' : ''
                         }`}
                       >
+                        {/* Cover Photo Header */}
+                        {card.coverImage && (
+                          <div className="w-[calc(100%+1.5rem)] h-28 -mx-3 -mt-3 mb-2.5 overflow-hidden bg-stone-100">
+                            <img
+                              src={card.coverImage}
+                              alt={card.title}
+                              className="w-full h-full object-cover group-hover:scale-103 transition duration-300"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                        )}
+
                         {/* Label Stripe / Badge if set */}
                         {card.color && (
                           <div className="flex items-center gap-1.5 mb-2">
@@ -1346,6 +1375,16 @@ export const ProjectsView: React.FC<ProjectsViewProps> = ({ onOpenQuickAdd }) =>
 
                           {card.hasDescription && (
                             <AlignLeft className="w-3 h-3 text-stone-400" title="Has notes" />
+                          )}
+
+                          {(card.hasAttachment || card.coverImage || (card.images && card.images.length > 0)) && (
+                            <span
+                              className="flex items-center gap-1 font-medium text-purple-600"
+                              title={`${card.images?.length || 1} image attachment${(card.images?.length || 1) > 1 ? 's' : ''}`}
+                            >
+                              <ImageIcon className="w-3 h-3" />
+                              {card.images && card.images.length > 0 ? card.images.length : ''}
+                            </span>
                           )}
                         </div>
                       </div>

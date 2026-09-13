@@ -494,6 +494,8 @@ export const INITIAL_WORKSPACE_DATA: WorkspaceData = {
       color: '#8b5cf6',
       labelName: 'High Impact',
       dueDate: '2026-09-15',
+      coverImage: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=800&q=80',
+      hasAttachment: true,
       hasDescription: true,
       checklists: [
         { id: 'c4', title: 'Compile competitor examples', completed: true },
